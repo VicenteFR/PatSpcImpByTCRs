@@ -1,0 +1,30 @@
+{
+    "__default__":
+    {
+        "walltime": "160:00:00",
+        "cores": "1",
+        "memory": "120g",
+        "threads": "1"
+    },
+    "process_output":
+    {
+      "walltime": "160:00:00",
+      "cores": "1",
+      "memory": "120g",
+      "threads": "1"
+    },
+    "run_tool":
+    {
+      "walltime": "160:00:00",
+      "cores": "1",
+      "memory": "300g",
+      "threads": "1"
+    },
+    "get_clust_input":
+    {
+      "walltime": "160:00:00",
+      "cores": "1",
+      "memory": "120g",
+      "threads": "1"
+    }
+}

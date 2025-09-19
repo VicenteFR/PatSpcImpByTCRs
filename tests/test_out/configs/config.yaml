@@ -1,0 +1,81 @@
+# ---> General.
+paths:
+  output: ~/tools/PatSpcImpByTCRs/tests/test_out
+  PIPELINE: ~/tools/PatSpcImpByTCRs
+  R_functions: ~/tools/PatSpcImpByTCRs/workflow/scripts/handy_functions.R
+qry_id: HIPC-1
+
+# ---> On assignment options.
+vdj_match_opts:
+  # EpRef-1: ['TRUE', 'FALSE']
+  EpRef-1: ['TRUE']
+  # EpRef-2: ['TRUE', 'FALSE']
+  EpRef-2: ['TRUE']
+
+ref_tholds:
+  # EpRef-1: [1, 2, 3]
+  EpRef-1: [1]
+  # EpRef-2: [1, 2, 3, 4, 5]
+  EpRef-2: [5]
+
+# ---> On TCR UCMs.
+ucm_tholds:
+  EpRef-1: [2, 3]
+  EpRef-2: [2, 3]
+
+# ---> On TCR data
+tcr_data:
+  EpRef-1:
+    aggr_table: '~/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
+    aggr_out: '~/tools/PatSpcImpByTCRs/tests/vdj_data'
+  EpRef-2:
+    aggr_table: '~/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
+    aggr_out: '~/tools/PatSpcImpByTCRs/tests/vdj_data'
+
+# ---> On gene expression data.
+gex_data:
+  EpRef-1:
+    aggr_table: '~/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
+    aggr_out: ''
+    # aggr_out: '--RawData /path/to/out --FeatureID ensembl' Uncomment if seurat object has Ensembl IDs as feature IDs instead of gene symbols.
+    seurat_obj: '~/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD8s.RDS'
+    donor_id_tag: 'donor.id.tag'
+    lib_id_tag: 'library.id.tag'
+    clusters_tag: 'RNA_snn_res.0.3'
+    cluster_defs: # Optional. Remove if unwanted.
+      1: 'Prolif'
+      0: 'Activated-1'
+      2: 'Activated-2'
+    cluster_cols: # Optional. Remove if unwanted.
+      1: '#D3D3D3' # Prolif
+      0: '#8000FF' # TRM
+      2: '#676765' # MAIT
+  EpRef-2:
+    aggr_table: '~/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
+    aggr_out: ''
+    # aggr_out: '--RawData /path/to/out --FeatureID ensembl' Uncomment if seurat object has Ensembl IDs as feature IDs instead of gene symbols.
+    seurat_obj: '~/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD4s.RDS'
+    donor_id_tag: 'donor.id.tag'
+    clusters_tag: 'RNA_snn_res.0.2'
+    cluster_defs: # Optional. Remove if unwanted.
+      1: 'Prolif'
+      0: 'Activated'
+      2: 'TREG'
+    cluster_cols: # Optional. Remove if unwanted.
+      1: '#D3D3D3' # Prolif
+      0: '#3333FF' # TRM
+      2: '#319272' # TREG
+
+# ---> "Experimental data": Donor-matched TCR seqs. with known pathogen specificity (e.g., from blood).
+exp_data: null # When no data unavailable
+
+# ---> Other non-mandatory options.
+# HLA data — CURRENTLY DISABLED. TO BE FIXED AND ADDED IN FOLLOWING RELEASE.
+# qry_hla_info: null # When no HLA file is to be provided.
+# For creation of general TCR data tables.
+# mod_sig_path: null
+# exp.set.file: null
+stat_cell_thold: 3
+# Limit of detection. Cell absolute frequency threshold to call a response against a pathogen for a given donor.
+limit_of_detect: 1
+# donor_meta: null

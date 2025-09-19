@@ -1,0 +1,133 @@
+# ---> On TCR reference sets.
+
+# Specificities in metadata per reference set.
+ref_specs:
+  EpRef-1:
+    ref_data: '/path/to/references/Ref-1_CloneBasedInfo.csv'
+    clust_data: '/path/to/references/Ref-1_CellBasedInfo.csv'
+    t_subset: CD8
+    clonotype_id_tag: tcr.id
+    score_tag: exp.category # If no column defining clonotype priority exists, just drop this line for either or both of the references. If it exists, it should be a numerical variable, where priority is defined in an ascending manner; i.e., the larger its priority number, the bigger the clonotype's priority.
+    ag_spc_tag: specificity.class.tag
+    cdr3b_aa_tag: beta.chain
+    cdr3a_aa_tag: alpha.chain
+    trb_v: 'trbv.base'
+    trb_j: 'trbj.base'
+    tra_v: 'trav.base'
+    tra_j: 'traj.base'
+    # donor_id_tag: '' # Does not exist on reference.
+    tags_of_int: 'exp.category;beta.chain;alpha.chain;trbv.base;trbj.base;trav.base;traj.base;data.base;specificity.ags.tag;consensus.organism;epitope.seq;antigen;mhc.gene;mhc.allele;simp.assay.method;pmid'
+    ags_to_keep: 'Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2,HBV,HCV,Homo sapiens'
+    hla_info: mhc.allele
+    ag_groups: # If none, just drop this option
+      Broad_viruses: 'CMV,EBV'
+      Respiratory_viruses: 'IAV,MPV,PIV,RSV,SARS-CoV-2'
+      Respiratory_pathogens: 'Aspergillus,B-pertussis-Rest,B-pertussis-Vax,IAV,MPV,PIV,RSV,SARS-CoV-2'
+  EpRef-2:
+    ref_data: '/path/to/references/Ref-2_CloneBasedInfo.csv'
+    clust_data: '/path/to/references/Ref-2_CellBasedInfo.csv'
+    t_subset: CD4
+    clonotype_id_tag: clonotype.tag
+    score_tag: freq.conf.lvl
+    ag_spc_tag: specificity.raw.tag
+    cdr3b_aa_tag: cdr3b.aa.seq
+    cdr3a_aa_tag: cdr3a.aa.seq
+    trb_v: 'trb.v'
+    trb_j: 'trb.j'
+    tra_v: 'tra.v'
+    tra_j: 'tra.j'
+    donor_id_tag: 'donor.id.tag'
+    tags_of_int: 'freq.conf.lvl;cdr3b.aa.seq;cdr3a.aa.seq;trb.v;trb.j;tra.v;tra.j;donor.id.tag;specificity.class.tag;specificity.ags.tag'
+    ags_to_keep: 'Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2'
+    hla_info: /mnt/BioAdHoc/Groups/vd-vijay/vfajardo/R24/paper_developments/DICE-VirusSpec/donors_metadata/HLATyping_DICE-TCR_Processed.csv
+    ag_groups: # If none, just drop this option
+      Broad_viruses: 'CMV,EBV'
+      Respiratory_viruses: 'IAV,MPV,PIV,RSV,SARS-CoV-2'
+      Respiratory_pathogens: 'Aspergillus,B-pertussis-Rest,B-pertussis-Vax,IAV,MPV,PIV,RSV,SARS-CoV-2'
+
+# Reference set input options for TCR UCM models.
+input_opts:
+  EpRef-1:
+    '1': "'specificity.class.tag:CMV,IAV,EBV,SARS-CoV-2,HBV,HCV,Homo sapiens,Cross-reactive;exp.category:1'"
+    '2': "'specificity.class.tag:CMV,IAV,EBV,SARS-CoV-2,HBV,HCV,Homo sapiens,Cross-reactive;exp.category:1,2'"
+    '3': "'specificity.class.tag:CMV,IAV,EBV,SARS-CoV-2,HBV,HCV,Homo sapiens,Cross-reactive;exp.category:2'"
+  EpRef-2:
+    '0': "'specificity.raw.tag:Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2;freq.conf.lvl:0,1,2,3,4,5'"
+    '1': "'specificity.raw.tag:Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2;freq.conf.lvl:1,2,3,4,5'"
+    '2': "'specificity.raw.tag:Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2;freq.conf.lvl:2,3,4,5'"
+    '3': "'specificity.raw.tag:Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2;freq.conf.lvl:3,4,5'"
+    '4': "'specificity.raw.tag:Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2;freq.conf.lvl:4,5'"
+    '5': "'specificity.raw.tag:Aspergillus,B-pertussis-Rest,B-pertussis-Vax,CMV,EBV,IAV,MPV,PIV,RSV,SARS-CoV-2;freq.conf.lvl:5'"
+
+# ---> On TCR UCMs.
+# General options, as determined by benchmarking.
+tool_opts:
+  GIANA: '-t 4'
+  TCRdist3: '--Method DBSCAN --Hyper 0.01 --Chains beta'
+  GLIPH2: '--PttnLength 5 --FisherPThold 0.005 --LocalMinP 0.0001 --KMin 5 --RefVersion "2.0" --JobMem 50 --TimeLimit 2880'
+  clusTCR: '--Method "two-step" --Expansion 3 --Inflation 1.2 --UseAlpha FALSE'
+  iSMART: '-t 7.5'
+
+# Reference set-specific options.
+ref_opts:
+  EpRef-1:
+    GIANA: ''
+    TCRdist3: ''
+    GLIPH2: '--RefCellType CD8'
+    clusTCR: ''
+    ALICE: ''
+    iSMART: ''
+  EpRef-2:
+    GIANA: ''
+    TCRdist3: ''
+    GLIPH2: '--RefCellType CD4'
+    clusTCR: ''
+    ALICE: ''
+    iSMART: ''
+
+# Results processing options.
+process_opts:
+  EpRef-1: '--DonorMinCount 1'
+  EpRef-2: '--DonorMinCount 1'
+
+
+# ---> On specificity prediction process.
+qry_specs:
+  donor_id_tag: 'donor.id.tag'
+
+weight_vector:
+  GIANA: 5
+  TCRdist3: 4
+  GLIPH2: 1
+  clusTCR: 2
+  iSMART: 3
+
+# ---> Aesthetics.
+ag_spc_cols:
+    CMV: '#B22222'
+    EBV: '#FF8C00'
+    IAV: '#0095B3'
+    FLU: '#0095B3'
+    SARS-CoV-2: '#9932CC'
+    MPV: '#FF5EA2'
+    RSPV: '#FFD700'
+    PIV: '#FFD700'
+    RSV: '#59B300'
+    HAV: '#E69500'
+    HBV: '#CC8400'
+    HCV: '#B37400'
+    YFV: '#C1779B'
+    SARS-CoV: '#A24B4A'
+    'B. pertussis Vax': '#754600'
+    'B-pertussis-Vax': '#754600'
+    'B. pertussis Rest': '#C37600'
+    'B-pertussis-Rest': '#C37600'
+    Aspergillus: '#005746'
+    'Homo sapiens': '#779BC1'
+    'Cross-reactive': '#cccc00'
+    Multiple: '#808080'
+
+
+# ---> On versions and scripts
+r_mod: 'R/3.6.1'
+preds_r_mod: 'R/4.2.2'
