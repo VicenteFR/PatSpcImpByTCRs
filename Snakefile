@@ -80,6 +80,15 @@ def get_tool_opts(wildcards):
     )
 
 
+### -------------------------- Config file -------------------------- ###
+# Process paths as necessary.
+config['paths'] = {key: os.path.expanduser(path) for key, path in config['paths'].items()}
+for ref_id in ['EpRef-1', 'EpRef-2']:
+    config['tcr_data'][ref_id] = {key: os.path.expanduser(path) for key, path in config['tcr_data'][ref_id].items()}
+for ref_id in ['EpRef-1', 'EpRef-2']:
+    config['gex_data'][ref_id] = {key: os.path.expanduser(val) if key in ['aggr_table', 'seurat_obj'] else val for key, val in config['gex_data'][ref_id].items()}
+
+
 ### ----------------------------- Rules ----------------------------- ###
 
 include: './workflow/rules/prepare_input.smk'

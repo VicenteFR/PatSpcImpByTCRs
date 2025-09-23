@@ -29,7 +29,8 @@ For details on the workflow, please see [**paper cite to be updated upon publica
 ------------
 ### 1. Clone the repository to a permanent location
 ```bash
-git clone https://github.com/VicenteFR/PatSpcImpByTCRs.git ~/tools/
+cd ~/tools
+git clone https://github.com/VicenteFR/PatSpcImpByTCRs.git
 ```
 Make sure to replace `~/tools` with the path you wish to clone the repo into, although this is the recommended location.<br>
 **Note that you only need to clone once**. Each new dataset/project should live in its own folder and reference this repository through the dataset-specific config file—see below.<br/>
@@ -48,7 +49,7 @@ Ref-2_CellBasedInfo.csv
 **Review note**: If you are reviewer, please kindly use the access token provided on the manuscript file to fetch the files from GEO.
 
 ### 3. Common config file set-up
-Edit the following file within the repo folder: `~/tools/PatSpcImpByTCRs/workflow/configs/common.yaml`. Replace `~/toools` with your selected repo folder if necessary. Please replace all instances of `/path/to/references` with the absolute path to the folder where you actually stored the reference set files per step 2.
+Edit the following file within the repo folder: `~/tools/PatSpcImpByTCRs/workflow/configs/common.yaml`. Replace `~/toools` by your selected repo folder if necessary. Please replace all instances of `/path/to/references` with the absolute path to the folder where you actually stored the reference set files per step 2.
 
 **You're all set!** Now, time to test the installation...
 
@@ -63,7 +64,7 @@ We provide a small demo dataset in `./tests` for quick testing.
 cd ~/tools/PatSpcImpByTCRs/tests/test_out
 ```
 
-2. Check the config file (config.yaml) to see the expected input/output and options structure. Please note that this will be the sole file that's meant to be changed for each dataset you apply the workflow to (more details below). If necessary, replace all instances of `/home/${USER}/tools/` by the alternative path you cloned the repo into. Please make sure that all instances have been properly replaced before jumping into the next step.
+2. Check the config file (config.yaml) to see the expected input/output and options structure. Please note that this will be the sole file that's meant to be changed for each dataset you apply the workflow to (more details below). If necessary, replace all path instances of `~/toools` by your alternative repo folder. Please make sure that all instances have been properly replaced before jumping into the next step.
 
 3. Activate your Snakemake conda environment and run a dry run to check the DAG:
 ```bash
