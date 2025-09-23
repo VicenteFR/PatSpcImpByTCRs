@@ -1,8 +1,8 @@
 # ---> General.
 paths:
-  output: ~/tools/PatSpcImpByTCRs/tests/test_out
-  PIPELINE: ~/tools/PatSpcImpByTCRs
-  R_functions: ~/tools/PatSpcImpByTCRs/workflow/scripts/handy_functions.R
+  output: '/home/${USER}/tools/PatSpcImpByTCRs/tests/test_out'
+  PIPELINE: '/home/${USER}/tools/PatSpcImpByTCRs'
+  R_functions: '/home/${USER}/tools/PatSpcImpByTCRs/workflow/scripts/handy_functions.R'
 qry_id: HIPC-1
 
 # ---> On assignment options.
@@ -26,19 +26,19 @@ ucm_tholds:
 # ---> On TCR data
 tcr_data:
   EpRef-1:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
-    aggr_out: '~/tools/PatSpcImpByTCRs/tests/vdj_data'
+    aggr_table: '/home/${USER}/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
+    aggr_out: '/home/${USER}/tools/PatSpcImpByTCRs/tests/vdj_data'
   EpRef-2:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
-    aggr_out: '~/tools/PatSpcImpByTCRs/tests/vdj_data'
+    aggr_table: '/home/${USER}/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
+    aggr_out: '/home/${USER}/tools/PatSpcImpByTCRs/tests/vdj_data'
 
 # ---> On gene expression data.
 gex_data:
   EpRef-1:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
+    aggr_table: '/home/${USER}/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
     aggr_out: ''
     # aggr_out: '--RawData /path/to/out --FeatureID ensembl' Uncomment if seurat object has Ensembl IDs as feature IDs instead of gene symbols.
-    seurat_obj: '~/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD8s.RDS'
+    seurat_obj: '/home/${USER}/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD8s.RDS'
     donor_id_tag: 'donor.id.tag'
     lib_id_tag: 'library.id.tag'
     clusters_tag: 'RNA_snn_res.0.3'
@@ -51,10 +51,10 @@ gex_data:
       0: '#8000FF' # TRM
       2: '#676765' # MAIT
   EpRef-2:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
+    aggr_table: '/home/${USER}/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
     aggr_out: ''
     # aggr_out: '--RawData /path/to/out --FeatureID ensembl' Uncomment if seurat object has Ensembl IDs as feature IDs instead of gene symbols.
-    seurat_obj: '~/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD4s.RDS'
+    seurat_obj: '/home/${USER}/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD4s.RDS'
     donor_id_tag: 'donor.id.tag'
     clusters_tag: 'RNA_snn_res.0.2'
     cluster_defs: # Optional. Remove if unwanted.

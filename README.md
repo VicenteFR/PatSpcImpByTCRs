@@ -4,10 +4,10 @@
 The workflow
 ------------
 
-This repository provides a Snakemake-based workflow to predict pathogen specificity of T cells from single-cell RNA-seq and TCR-seq datasets.<br\>
+This repository provides a Snakemake-based workflow to predict pathogen specificity of T cells from single-cell RNA-seq and TCR-seq datasets.<br/>
 The pipeline is modular, reproducible, and designed for easy reuse across projects via a wrapper Snakefile.
 
-For details on the workflow, please see **paper cite to be updated upon publication**.
+For details on the workflow, please see [**paper cite to be updated upon publication**].
 
 
 🔧 System requirements
@@ -63,18 +63,19 @@ We provide a small demo dataset in `./tests` for quick testing.
 cd ~/tools/PatSpcImpByTCRs/tests/test_out
 ```
 
-2. Check the config file (config.yaml) to see the expected input/output and options structure. Please note that this will be the sole file that's meant to be changed for each dataset you apply the workflow to (more details below).
+2. Check the config file (config.yaml) to see the expected input/output and options structure. Please note that this will be the sole file that's meant to be changed for each dataset you apply the workflow to (more details below). If necessary, replace all instances of `/home/${USER}/tools/` by the alternative path you cloned the repo into. Please make sure that all instances have been properly replaced before jumping into the next step.
 
 3. Activate your Snakemake conda environment and run a dry run to check the DAG:
 ```bash
 conda activate snakemake
 snakemake -np
 ```
-4. Execute the workflow on the demo dataset:
+4. Indicating the proper of cores available to you (example with 2 cores only), execute the workflow on the demo dataset:
 ```bash
 snakemake --cores 2
 ```
-This will generate example outputs in the results/ folder in under 10 minutes. File `AllDone.txt` in the folder `test_out` indicates that the workflow ran in its entirety.<br/>
+This will generate example outputs in the results/ folder in under 15 minutes when 2 cores are provided. Naturally, the greater the number of cores, the quicker the workflow will complete.<br/>
+File `AllDone.txt` in the folder `test_out` indicates that the workflow ran in its entirety.<br/>
 Several folders must be generated in the process, but the most relevant outputs are the following:<br/>
 `./specificity_pred/EpRef-1/VDJMatch-TRUE/RefThold-1/UCMThold-X`: Output for CD8 T cells.<br/>
 `./specificity_pred/EpRef-1/VDJMatch-TRUE/RefThold-2/UCMThold-X`: Output for CD4 T cells.

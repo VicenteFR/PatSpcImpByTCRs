@@ -1021,246 +1021,219 @@ for(tmp.pop in tmp.pops){
     )
 }
 
-# ----> Associations, preflights.
-# @ Population-specific frequencies
-tmp.data.1 <- gex.meta[,
-    .(freq.abs=.N),
-    by=.(
-        donor.id.tag,
-        pop.tag=paste0('C', cluster.tag)
+if(!is.null(donor.meta)){
+    # ----> Associations, preflights.
+    # @ Population-specific frequencies
+    tmp.data.1 <- gex.meta[,
+        .(freq.abs=.N),
+        by=.(
+            donor.id.tag,
+            pop.tag=paste0('C', cluster.tag)
+        )
+    ]
+    tmp.data.2 <- gex.meta[,
+        .(freq.total=.N),
+        by=.(donor.id.tag)
+    ]
+    tmp.data <- merge(x=tmp.data.1, y=tmp.data.2, by='donor.id.tag')
+    tmp.data[, freq.rel:=freq.abs/freq.total]
+    tmp.data <- tmp.data[, .(donor.id.tag, pop.tag, freq.rel)]
+    tmp.data <- as.data.table(spread(data=tmp.data, key=pop.tag, value=freq.rel, fill=0))
+    # Merge w/ antigen-specific fractions.
+    plot.data <- merge(
+        x=quant.data, y=tmp.data,
+        by='donor.id.tag', all.x=TRUE, all.y=FALSE
     )
-]
-tmp.data.2 <- gex.meta[,
-    .(freq.total=.N),
-    by=.(donor.id.tag)
-]
-tmp.data <- merge(x=tmp.data.1, y=tmp.data.2, by='donor.id.tag')
-tmp.data[, freq.rel:=freq.abs/freq.total]
-tmp.data <- tmp.data[, .(donor.id.tag, pop.tag, freq.rel)]
-tmp.data <- as.data.table(spread(data=tmp.data, key=pop.tag, value=freq.rel, fill=0))
-# Merge w/ antigen-specific fractions.
-plot.data <- merge(
-    x=quant.data, y=tmp.data,
-    by='donor.id.tag', all.x=TRUE, all.y=FALSE
-)
-# Merge w/ donor metadata
-plot.data <- merge(x=plot.data, y=donor.meta, by='donor.id.tag', all.x=TRUE)
+    # Merge w/ donor metadata
+    plot.data <- merge(x=plot.data, y=donor.meta, by='donor.id.tag', all.x=TRUE)
 
-# ---> Association between predictions and continuous variables.
-tmp.reports.path <- paste0(phens.path, '/assoc_vars-cont')
-if(!dir.exists(tmp.reports.path)) dir.create(tmp.reports.path)
-# Define continuous variables.
-cont.vars <- sapply(X=colnames(donor.meta), FUN=function(tmp.col){
-    is.numeric(donor.meta[[tmp.col]]) &
-    tmp.col!='donor.id.tag'
-})
-cont.vars <- c(
-    names(donor.meta)[cont.vars],
-    paste0('C', gex.meta[, unique(cluster.tag)])
-)
-names(cont.vars) <- str_to_upper(str_replace_all(
-    string=str_replace_all(string=cont.vars, pattern='\\.tag$|^donor\\.', replacement=''),
-    pattern='\\.|_', replacement=' '
-))
-# Process per continuous variable.
-uniq.spcs <- plot.data[, unique(ag.group)]
-for(cont.var in names(cont.vars)){
-    for(tmp.spc in uniq.spcs){
-        tmp.data <- plot.data[
-            ag.group==tmp.spc,
-            .(
-                cont.var=get(cont.vars[cont.var]),
-                freq.var=cell.freq.rel,
-                tmp.var=cat.tag
-            )
-        ]
-        tmp.ggplot <- ggplot(data=tmp.data, aes(x=cont.var, y=freq.var, color=tmp.var)) +
-            geom_point(shape=1, stroke=5, size=12, color='black') +
-            geom_smooth(method='lm', formula=y~x, se=FALSE, fullrange=TRUE, linewidth=5) +
-            scale_x_continuous(breaks=scales::pretty_breaks(n=3)) +
-            scale_y_continuous(breaks=scales::pretty_breaks(n=3)) +
-            scale_color_manual(values=cluster.cols) +
-            labs(x='Continuous variable', y='% of ag-specific T cells')
-        tmp.lab <- paste0(
-            '/Association_', tmp.spc, '_',  cont.var
-        )
-        publish.plot(
-            tmp.ggplot=tmp.ggplot, output.path=tmp.reports.path, file.name=tmp.lab, type='pdf',
-            stat.cor=TRUE, cor.group='tmp.var',
-            blank.comp=blank.complement.3, do.legend=FALSE, do.rotate=TRUE, width=14, height=14
-        )
-    }
-}
-
-# ---> Association between predictions and discrete variables.
-tmp.reports.path <- paste0(phens.path, '/assoc_vars-disc')
-if(!dir.exists(tmp.reports.path)) dir.create(tmp.reports.path)
-# Define discrete variables.
-disc.vars <- sapply(X=colnames(donor.meta), FUN=function(tmp.col){
-    (is.character(donor.meta[[tmp.col]]) | is.factor(donor.meta[[tmp.col]])) &
-    tmp.col!='donor.id.tag'
-})
-disc.vars <- colnames(donor.meta)[disc.vars]
-names(disc.vars) <- str_to_upper(str_replace_all(
-    string=str_replace_all(string=disc.vars, pattern='\\.tag$|^donor\\.', replacement=''),
-    pattern='\\.|_', replacement=' '
-))
-# Process per cell type.
-uniq.spcs <- plot.data[, unique(ag.group)]
-for(tmp.spc in uniq.spcs){
-    for(disc.var in names(disc.vars)){
-        tmp.vals <- sort(as.character(plot.data[, unique(cat.tag)]))
-        tmp.file.name <- paste0(
-            tmp.reports.path, '/Comparison_', tmp.spc, '_',  disc.var, '.pdf'
-        )
-        pdf(file=tmp.file.name)
-        for(tmp.val in tmp.vals){
+    # ---> Association between predictions and continuous variables.
+    tmp.reports.path <- paste0(phens.path, '/assoc_vars-cont')
+    if(!dir.exists(tmp.reports.path)) dir.create(tmp.reports.path)
+    # Define continuous variables.
+    cont.vars <- sapply(X=colnames(donor.meta), FUN=function(tmp.col){
+        is.numeric(donor.meta[[tmp.col]]) &
+        tmp.col!='donor.id.tag'
+    })
+    cont.vars <- c(
+        names(donor.meta)[cont.vars],
+        paste0('C', gex.meta[, unique(cluster.tag)])
+    )
+    names(cont.vars) <- str_to_upper(str_replace_all(
+        string=str_replace_all(string=cont.vars, pattern='\\.tag$|^donor\\.', replacement=''),
+        pattern='\\.|_', replacement=' '
+    ))
+    # Process per continuous variable.
+    uniq.spcs <- plot.data[, unique(ag.group)]
+    for(cont.var in names(cont.vars)){
+        for(tmp.spc in uniq.spcs){
             tmp.data <- plot.data[
-                ag.group==tmp.spc &
-                cat.tag==tmp.val,
+                ag.group==tmp.spc,
                 .(
-                    disc.var=get(disc.vars[disc.var]),
-                    freq.var=cell.freq.rel
+                    cont.var=get(cont.vars[cont.var]),
+                    freq.var=cell.freq.rel,
+                    tmp.var=cat.tag
                 )
             ]
-            # Stats.
-            if(tmp.data[, uniqueN(disc.var)==2]){
-                tmp.groups <- tmp.data[, unique(disc.var)]
-                tmp.test <- wilcox.test(
-                    x=tmp.data[disc.var==tmp.groups[1], freq.var],
-                    y=tmp.data[disc.var==tmp.groups[2], freq.var],
-                    paired=FALSE
-                )
-                tmp.caption <- paste0('P-value is ', round(x=tmp.test$p.value, digits=6))
-            }else{
-                tmp.caption <- ''
-            }
-            # Set upper bound.
-            tmp.bound <- tmp.data[, max(freq.var)]
-            tmp.data[, bounded.var:=freq.var]
-            tmp.data[, point.status:='ori']
-            tmp.data[freq.var>tmp.bound, `:=`(bounded.var=tmp.bound, point.status='bounded')]
-            # Plot.
-            tmp.ggplot <- ggplot(data=tmp.data, aes(x=disc.var)) +
-                geom_boxplot(aes(y=freq.var, color=disc.var), width=0.7, linewidth=4, outlier.shape=NA) +
-                geom_jitter(aes(y=bounded.var, shape=point.status), stroke=5, size=10, color='black', width=0.22) +
+            tmp.ggplot <- ggplot(data=tmp.data, aes(x=cont.var, y=freq.var, color=tmp.var)) +
+                geom_point(shape=1, stroke=5, size=12, color='black') +
+                geom_smooth(method='lm', formula=y~x, se=FALSE, fullrange=TRUE, linewidth=5) +
+                scale_x_continuous(breaks=scales::pretty_breaks(n=3)) +
                 scale_y_continuous(breaks=scales::pretty_breaks(n=3)) +
-                scale_shape_manual(values=tmp.shapes) +
-                # scale_color_manual(values=tmp.cols) +
-                coord_cartesian(ylim=c(0, tmp.bound)) +
-                labs(
-                    title=paste0('Cluster ', tmp.val),
-                    x='', y='% of ag-specific T cells',
-                    color='', caption=tmp.caption
-                ) +
-                theme(legend.position='none') +
-                theme_bw()
-            print(tmp.ggplot)
+                scale_color_manual(values=cluster.cols) +
+                labs(x='Continuous variable', y='% of ag-specific T cells')
+            tmp.lab <- paste0(
+                '/Association_', tmp.spc, '_',  cont.var
+            )
+            publish.plot(
+                tmp.ggplot=tmp.ggplot, output.path=tmp.reports.path, file.name=tmp.lab, type='pdf',
+                stat.cor=TRUE, cor.group='tmp.var',
+                blank.comp=blank.complement.3, do.legend=FALSE, do.rotate=TRUE, width=14, height=14
+            )
         }
-        dev.off()
     }
-}
 
-# ----> Associations, summary.
-tmp.reports.path <- paste0(phens.path, '/assoc_vars-cont-summ')
-if(!dir.exists(tmp.reports.path)) dir.create(tmp.reports.path)
-# Data retrieval
-#       Response variables.
-tmp.data.1 <- quant.data[
-    ag.group %in% names(ag.spc.cols),
-    .(ag.group, donor.id.tag, cluster=paste0('C', cat.tag), cell.freq.rel)
-]
-tmp.data.1[, key:=paste(ag.group, cluster, sep='.')]
-tmp.data.1 <- tmp.data.1[, .(donor.id.tag, key, cell.freq.rel)]
-tmp.data.1 <- as.data.table(spread(data=tmp.data.1, key=key, value=cell.freq.rel, fill=NA))
-var.set.1 <- setdiff(x=colnames(tmp.data.1), y='donor.id.tag')
-#       Explanatory variables.
-tmp.data.2.1 <- gex.meta[
-    !is.na(donor.id.tag),
-    .(freq.abs=.N),
-    by=.(
-        donor.id.tag,
-        cluster=paste0('C', cluster.tag)
+    # ---> Association between predictions and discrete variables.
+    tmp.reports.path <- paste0(phens.path, '/assoc_vars-disc')
+    if(!dir.exists(tmp.reports.path)) dir.create(tmp.reports.path)
+    # Define discrete variables.
+    disc.vars <- sapply(X=colnames(donor.meta), FUN=function(tmp.col){
+        (is.character(donor.meta[[tmp.col]]) | is.factor(donor.meta[[tmp.col]])) &
+        tmp.col!='donor.id.tag'
+    })
+    disc.vars <- colnames(donor.meta)[disc.vars]
+    names(disc.vars) <- str_to_upper(str_replace_all(
+        string=str_replace_all(string=disc.vars, pattern='\\.tag$|^donor\\.', replacement=''),
+        pattern='\\.|_', replacement=' '
+    ))
+    # Process per cell type.
+    uniq.spcs <- plot.data[, unique(ag.group)]
+    for(tmp.spc in uniq.spcs){
+        for(disc.var in names(disc.vars)){
+            tmp.vals <- sort(as.character(plot.data[, unique(cat.tag)]))
+            tmp.file.name <- paste0(
+                tmp.reports.path, '/Comparison_', tmp.spc, '_',  disc.var, '.pdf'
+            )
+            pdf(file=tmp.file.name)
+            for(tmp.val in tmp.vals){
+                tmp.data <- plot.data[
+                    ag.group==tmp.spc &
+                    cat.tag==tmp.val,
+                    .(
+                        disc.var=get(disc.vars[disc.var]),
+                        freq.var=cell.freq.rel
+                    )
+                ]
+                # Stats.
+                if(tmp.data[, uniqueN(disc.var)==2]){
+                    tmp.groups <- tmp.data[, unique(disc.var)]
+                    tmp.test <- wilcox.test(
+                        x=tmp.data[disc.var==tmp.groups[1], freq.var],
+                        y=tmp.data[disc.var==tmp.groups[2], freq.var],
+                        paired=FALSE
+                    )
+                    tmp.caption <- paste0('P-value is ', round(x=tmp.test$p.value, digits=6))
+                }else{
+                    tmp.caption <- ''
+                }
+                # Set upper bound.
+                tmp.bound <- tmp.data[, max(freq.var)]
+                tmp.data[, bounded.var:=freq.var]
+                tmp.data[, point.status:='ori']
+                tmp.data[freq.var>tmp.bound, `:=`(bounded.var=tmp.bound, point.status='bounded')]
+                # Plot.
+                tmp.ggplot <- ggplot(data=tmp.data, aes(x=disc.var)) +
+                    geom_boxplot(aes(y=freq.var, color=disc.var), width=0.7, linewidth=4, outlier.shape=NA) +
+                    geom_jitter(aes(y=bounded.var, shape=point.status), stroke=5, size=10, color='black', width=0.22) +
+                    scale_y_continuous(breaks=scales::pretty_breaks(n=3)) +
+                    scale_shape_manual(values=tmp.shapes) +
+                    # scale_color_manual(values=tmp.cols) +
+                    coord_cartesian(ylim=c(0, tmp.bound)) +
+                    labs(
+                        title=paste0('Cluster ', tmp.val),
+                        x='', y='% of ag-specific T cells',
+                        color='', caption=tmp.caption
+                    ) +
+                    theme(legend.position='none') +
+                    theme_bw()
+                print(tmp.ggplot)
+            }
+            dev.off()
+        }
+    }
+
+    # ----> Associations, summary.
+    tmp.reports.path <- paste0(phens.path, '/assoc_vars-cont-summ')
+    if(!dir.exists(tmp.reports.path)) dir.create(tmp.reports.path)
+    # Data retrieval
+    #       Response variables.
+    tmp.data.1 <- quant.data[
+        ag.group %in% names(ag.spc.cols),
+        .(ag.group, donor.id.tag, cluster=paste0('C', cat.tag), cell.freq.rel)
+    ]
+    tmp.data.1[, key:=paste(ag.group, cluster, sep='.')]
+    tmp.data.1 <- tmp.data.1[, .(donor.id.tag, key, cell.freq.rel)]
+    tmp.data.1 <- as.data.table(spread(data=tmp.data.1, key=key, value=cell.freq.rel, fill=NA))
+    var.set.1 <- setdiff(x=colnames(tmp.data.1), y='donor.id.tag')
+    #       Explanatory variables.
+    tmp.data.2.1 <- gex.meta[
+        !is.na(donor.id.tag),
+        .(freq.abs=.N),
+        by=.(
+            donor.id.tag,
+            cluster=paste0('C', cluster.tag)
+        )
+    ]
+    tmp.data.2.2 <- gex.meta[
+        !is.na(donor.id.tag),
+        .(freq.total=.N),
+        by=.(donor.id.tag)
+    ]
+    tmp.data.2 <- merge(x=tmp.data.2.1, y=tmp.data.2.2, by='donor.id.tag')
+    tmp.data.2[, freq.rel:=freq.abs/freq.total]
+    tmp.data.2 <- tmp.data.2[, .(
+        donor.id.tag, cluster, freq.rel
+    )]
+    tmp.data.2 <- as.data.table(spread(data=tmp.data.2, key=cluster, value=freq.rel, fill=0))
+    #       Other clinical and demographical variables.
+    tmp.cols <- c('donor.id.tag', cont.vars[cont.vars %in% colnames(donor.meta)])
+    tmp.data.2 <- merge(
+        x=tmp.data.2, y=donor.meta[, ..tmp.cols],
+        by='donor.id.tag', all=TRUE
     )
-]
-tmp.data.2.2 <- gex.meta[
-    !is.na(donor.id.tag),
-    .(freq.total=.N),
-    by=.(donor.id.tag)
-]
-tmp.data.2 <- merge(x=tmp.data.2.1, y=tmp.data.2.2, by='donor.id.tag')
-tmp.data.2[, freq.rel:=freq.abs/freq.total]
-tmp.data.2 <- tmp.data.2[, .(
-    donor.id.tag, cluster, freq.rel
-)]
-tmp.data.2 <- as.data.table(spread(data=tmp.data.2, key=cluster, value=freq.rel, fill=0))
-#       Other clinical and demographical variables.
-tmp.cols <- c('donor.id.tag', cont.vars[cont.vars %in% colnames(donor.meta)])
-tmp.data.2 <- merge(
-    x=tmp.data.2, y=donor.meta[, ..tmp.cols],
-    by='donor.id.tag', all=TRUE
-)
-var.set.2 <- setdiff(x=colnames(tmp.data.2), y='donor.id.tag')
-# @ Full set of vars.
-to.plot <- merge(x=tmp.data.2, y=tmp.data.1, by='donor.id.tag')
-to.plot <- as.data.frame(to.plot)
-row.names(to.plot) <- to.plot$donor.id.tag; to.plot$donor.id.tag <- NULL
-to.plot <- as.matrix(to.plot)
-# @ Pairwise distance and significance calculation
-corr.data <- rcorr(to.plot, type='spearman')
-r.mat <- corr.data$r
-r.mat <- r.mat[
-    var.set.2,
-    var.set.1
-]
-p.mat <- corr.data$P
-p.mat <- p.mat[
-    var.set.2,
-    var.set.1
-]
-# @ Correlation plot, across the board
-tmp.width <- ncol(r.mat)/2
-tmp.height <- nrow(r.mat)/2
-tmp.file.name <- paste0(
-    tmp.reports.path, '/',
-    'CorrPlot_Dist-Spearman_ALL',
-    '.C.pdf'
-)
-pdf(file=tmp.file.name, width=tmp.width+2, height=tmp.height+2)
-corrplot(
-    corr=r.mat,
-    method = 'circle', type='full',
-    col=rev(x=COL2('RdBu', 200)),
-    diag=TRUE,
-    p.mat=p.mat, sig.level=0.01, insig='blank',
-    outline=TRUE,
-    addgrid.col='black',
-    tl.pos='lt',
-    tl.cex=1, tl.col='black',
-    cl.pos='r'
-)
-dev.off()
-# @ Correlation plot, one plot per pathogen specificity.
-uniq.spcs <- plots.data[!is.na(consensus.pred), as.character(unique(consensus.pred))]
-for(tmp.spc in uniq.spcs){
-    tmp.cols <- colnames(r.mat)[colnames(r.mat) %like% paste0('^', tmp.spc)]
-    r.plot.mat <- r.mat[, tmp.cols]
-    if(all(is.na(r.plot.mat))) next
-    p.plot.mat <- p.mat[, tmp.cols]
-    tmp.width <- ncol(r.plot.mat)/2
-    tmp.height <- nrow(r.plot.mat)/2
+    var.set.2 <- setdiff(x=colnames(tmp.data.2), y='donor.id.tag')
+    # @ Full set of vars.
+    to.plot <- merge(x=tmp.data.2, y=tmp.data.1, by='donor.id.tag')
+    to.plot <- as.data.frame(to.plot)
+    row.names(to.plot) <- to.plot$donor.id.tag; to.plot$donor.id.tag <- NULL
+    to.plot <- as.matrix(to.plot)
+    # @ Pairwise distance and significance calculation
+    corr.data <- rcorr(to.plot, type='spearman')
+    r.mat <- corr.data$r
+    r.mat <- r.mat[
+        var.set.2,
+        var.set.1
+    ]
+    p.mat <- corr.data$P
+    p.mat <- p.mat[
+        var.set.2,
+        var.set.1
+    ]
+    # @ Correlation plot, across the board
+    tmp.width <- ncol(r.mat)/2
+    tmp.height <- nrow(r.mat)/2
     tmp.file.name <- paste0(
         tmp.reports.path, '/',
-        'CorrPlot_Dist-Spearman_Spc-', tmp.spc,
+        'CorrPlot_Dist-Spearman_ALL',
         '.C.pdf'
     )
     pdf(file=tmp.file.name, width=tmp.width+2, height=tmp.height+2)
     corrplot(
-        corr=r.plot.mat,
+        corr=r.mat,
         method = 'circle', type='full',
         col=rev(x=COL2('RdBu', 200)),
         diag=TRUE,
-        p.mat=p.plot.mat, sig.level=0.01, insig='blank',
+        p.mat=p.mat, sig.level=0.01, insig='blank',
         outline=TRUE,
         addgrid.col='black',
         tl.pos='lt',
@@ -1268,6 +1241,35 @@ for(tmp.spc in uniq.spcs){
         cl.pos='r'
     )
     dev.off()
+    # @ Correlation plot, one plot per pathogen specificity.
+    uniq.spcs <- plots.data[!is.na(consensus.pred), as.character(unique(consensus.pred))]
+    for(tmp.spc in uniq.spcs){
+        tmp.cols <- colnames(r.mat)[colnames(r.mat) %like% paste0('^', tmp.spc)]
+        r.plot.mat <- r.mat[, tmp.cols]
+        if(all(is.na(r.plot.mat))) next
+        p.plot.mat <- p.mat[, tmp.cols]
+        tmp.width <- ncol(r.plot.mat)/2
+        tmp.height <- nrow(r.plot.mat)/2
+        tmp.file.name <- paste0(
+            tmp.reports.path, '/',
+            'CorrPlot_Dist-Spearman_Spc-', tmp.spc,
+            '.C.pdf'
+        )
+        pdf(file=tmp.file.name, width=tmp.width+2, height=tmp.height+2)
+        corrplot(
+            corr=r.plot.mat,
+            method = 'circle', type='full',
+            col=rev(x=COL2('RdBu', 200)),
+            diag=TRUE,
+            p.mat=p.plot.mat, sig.level=0.01, insig='blank',
+            outline=TRUE,
+            addgrid.col='black',
+            tl.pos='lt',
+            tl.cex=1, tl.col='black',
+            cl.pos='r'
+        )
+        dev.off()
+    }
 }
 
 

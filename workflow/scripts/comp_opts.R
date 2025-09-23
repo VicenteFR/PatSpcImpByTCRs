@@ -94,6 +94,8 @@ cat('### ----------------------- and preprocessing ----------------------- ###\n
 # ---> Prediction details.
 pred.summ <- lapply(X=out.paths, FUN=fread)
 pred.summ <- rbindlist(l=pred.summ, use.names=TRUE, fill=TRUE, idcol='opt')
+# Check for donor-matched data availability.
+exp.data.av <- !is.null(gen.wflow.opts$exp_data)
 tmp.cols <- c(
     'opt', 
     'clonotype.tag', 'donor.id.tag', 'abs.freq', 'rel.freq',
@@ -102,6 +104,9 @@ tmp.cols <- c(
     'RM.pred', 'RM.chain.class', 'RM.match.class',
     'UCM.pred', 'UCM.clust.class', 'UCM.ag.class', 'UCM.ratio', 'UCM.max.ags'
 )
+if(!exp.data.av){
+    tmp.cols <- tmp.cols[!tmp.cols %like% '^DM']
+}
 pred.summ <- pred.summ[, ..tmp.cols]
 pred.summ[, vdj.opt:=str_extract(
         string=str_extract(string=opt, pattern='VDJMatch-[^\\.]+'),
