@@ -450,6 +450,16 @@ cat('\n')
 cat('### ------------------------ Cell-based info ------------------------ ###\n')
 
 # ---> Piece parts together.
+# Clean metadata from TCR info if necessary.
+tmp.cols <- colnames(meta.data)[colnames(meta.data) %in% colnames(clone.info)]
+tmp.check <- length(tmp.cols)==0
+if(!tmp.check){
+    tmp.check <- paste0(tmp.cols, collapse='\n')
+    tmp.check <- paste0('Seurat object has TCR data annotations. Following columns will be prunned and re-annotated internally based on the input TCR data.\n', tmp.check, '\n')
+    warning(tmp.check)
+    tmp.cols <- setdiff(x=colnames(meta.data), y=tmp.cols)
+    meta.data <- meta.data[, ..tmp.cols]
+}
 # Find associations between barcodes and clonotypes.
 tmp.data <- unique(cell.clone.info[, .(barcode, clonotype.tag)])
 # Identify barcodes in TCR data that weren't found in the gene expression metadata.
