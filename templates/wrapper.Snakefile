@@ -48,8 +48,7 @@ import yaml, os
 # ---> Preflights.
 configfile: './configs/config.yaml'
 # Absolute or relative path to the pipeline repo
-# PIPELINE = os.path.expanduser("~/tools/PatSpcImpByTCRs")
-PIPELINE = os.path.expanduser("~/shared_code/PatSpcImpByTCRs")
+PIPELINE = os.path.expanduser("~/tools/PatSpcImpByTCRs")
 
 # ---> Full config options, combination of commong and dataset-specific options.
 # Load common config

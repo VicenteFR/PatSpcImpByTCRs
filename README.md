@@ -98,7 +98,7 @@ cp ~/tools/PatSpcImpByTCRs/templates/wrapper.Snakefile Snakefile
 3. Prepare a dataset-specific config:
 ```bash
 mkdir configs
-cp ~/tools/my-pipeline/templates/config.yaml configs/config.yaml
+cp ~/tools/PatSpcImpByTCRs/templates/config.yaml configs/config.yaml
 ```
 Please also make sure to modify options `PIPELINE` and `R_functions` under `paths` as necessary.
 

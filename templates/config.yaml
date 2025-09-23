@@ -1,73 +1,75 @@
 # ---> General.
 paths:
-  output: ~/tools/PatSpcImpByTCRs/tests/test_out
-  PIPELINE: ~/tools/PatSpcImpByTCRs
-  R_functions: ~/tools/PatSpcImpByTCRs/workflow/scripts/handy_functions.R
+  output: '~/projects/my-dataset' # REPLACE W/ ACTUAL PROJECT-SPECIFIC OUTPUT PATH.
+  PIPELINE: '~/tools/PatSpcImpByTCRs'
+  R_functions: '~/tools/PatSpcImpByTCRs/workflow/scripts/handy_functions.R'
 qry_id: HIPC-1
 
 # ---> On assignment options.
 vdj_match_opts:
-  # EpRef-1: ['TRUE', 'FALSE']
+  # EpRef-1: ['TRUE', 'FALSE'] # ALL AVAILABLE OPTIONS. UNCOMMENTED LINE SHOULD SPECIFY ONE OR MORE AMONG ALL AVAILABLE OPTIONS. SAME APPLIES TO REF. 2.
   EpRef-1: ['TRUE']
   # EpRef-2: ['TRUE', 'FALSE']
   EpRef-2: ['TRUE']
 
 ref_tholds:
-  # EpRef-1: [1, 2, 3]
-  EpRef-1: [1]
+  # EpRef-1: [1, 2, 3] # ALL AVAILABLE OPTIONS. UNCOMMENTED LINE SHOULD SPECIFY ONE OR MORE AMONG ALL AVAILABLE OPTIONS. SAME APPLIES TO REF. 2, BUT NOTE THAT AVAILABLE OPTIONS ARE DIFFERENT.
+  EpRef-1: [3]
   # EpRef-2: [1, 2, 3, 4, 5]
-  EpRef-2: [5]
+  EpRef-2: [1]
 
 # ---> On TCR UCMs.
 ucm_tholds:
-  EpRef-1: [2, 3]
-  EpRef-2: [2, 3]
+  EpRef-1: [2, 3, 4] # WE RECOMMEND A THRESHOLD EQUAL TO OR BIGGER THAN 3.
+  EpRef-2: [2, 3, 4]
 
 # ---> On TCR data
+# REPLACE W/ ACTUAL AGGR VDJ OUTPUTS, ONE PER REFERENCE. NOTE THAT IT MIGHT BE THE SAME FOR BOTH.
 tcr_data:
   EpRef-1:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
-    aggr_out: '~/tools/PatSpcImpByTCRs/tests/vdj_data'
+    aggr_table: '/path/to/ref_1/vdj_aggr_table.csv'
+    aggr_out: '/path/to/ref_1/vdj_aggr/out'
   EpRef-2:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/vdj_data/vdj_aggr_table.csv'
-    aggr_out: '~/tools/PatSpcImpByTCRs/tests/vdj_data'
+    aggr_table: '/path/to/ref_2/vdj_aggr_table.csv'
+    aggr_out: '/path/to/ref_2/vdj_aggr/out'
 
 # ---> On gene expression data.
+# REPLACE W/ ACTUAL GENE EXPRESSION DATA
 gex_data:
   EpRef-1:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
+    aggr_table: '/path/to/ref_1/gex_aggr_table.csv' # AGGR TABLE. SIMILAR TO THE ONE PROVIDED TO CELLRANGER VDJ.
     aggr_out: ''
     # aggr_out: '--RawData /path/to/out --FeatureID ensembl' Uncomment if seurat object has Ensembl IDs as feature IDs instead of gene symbols.
-    seurat_obj: '~/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD8s.RDS'
-    donor_id_tag: 'donor.id.tag'
+    seurat_obj: '/path/to/ref_1/SeuratObj.RDS' # SEURAT OBJECT IN RDS FORMAT.
+    donor_id_tag: 'donor.id.tag' # AS DECLARED IN SEURAT OBJECT'S METADATA.
     lib_id_tag: 'library.id.tag'
     clusters_tag: 'RNA_snn_res.0.3'
-    cluster_defs: # Optional. Remove if unwanted.
+    cluster_defs: # OPTIONAL. REMOVE ALL LINES IF UNWANTED.
       1: 'Prolif'
       0: 'Activated-1'
       2: 'Activated-2'
-    cluster_cols: # Optional. Remove if unwanted.
+    cluster_cols: # OPTIONAL. REMOVE ALL LINES IF UNWANTED.
       1: '#D3D3D3' # Prolif
       0: '#8000FF' # TRM
       2: '#676765' # MAIT
   EpRef-2:
-    aggr_table: '~/tools/PatSpcImpByTCRs/tests/gex_data/gex_aggr_table.csv'
+    aggr_table: '/path/to/ref_2/gex_aggr_table.csv'
     aggr_out: ''
     # aggr_out: '--RawData /path/to/out --FeatureID ensembl' Uncomment if seurat object has Ensembl IDs as feature IDs instead of gene symbols.
-    seurat_obj: '~/tools/PatSpcImpByTCRs/tests/gex_data/SeuratObj_CD4s.RDS'
-    donor_id_tag: 'donor.id.tag'
+    seurat_obj: '/path/to/ref_2/SeuratObj.RDS'
+    donor_id_tag: 'donor.id.tag' # AS DECLARED IN SEURAT OBJECT'S METADATA.
     clusters_tag: 'RNA_snn_res.0.2'
-    cluster_defs: # Optional. Remove if unwanted.
+    cluster_defs: # OPTIONAL. REMOVE ALL LINES IF UNWANTED.
       1: 'Prolif'
       0: 'Activated'
       2: 'TREG'
-    cluster_cols: # Optional. Remove if unwanted.
+    cluster_cols: # OPTIONAL. REMOVE ALL LINES IF UNWANTED.
       1: '#D3D3D3' # Prolif
       0: '#3333FF' # TRM
       2: '#319272' # TREG
 
 # ---> "Experimental data": Donor-matched TCR seqs. with known pathogen specificity (e.g., from blood).
-exp_data: null # When no data unavailable
+exp_data: null # WHEN NO DONOR-MATCHED TCR DATA ARE AVAILABLE. OTHERWISE, PROVIDE THE ABSOLUTE PATH TO THE CSV FILE. SPECIFIC FORMAT IS REQUIRED. SEE EXAMPLE IN REPO.
 
 # ---> Other non-mandatory options.
 # HLA data — CURRENTLY DISABLED. TO BE FIXED AND ADDED IN FOLLOWING RELEASE.
@@ -75,7 +77,7 @@ exp_data: null # When no data unavailable
 # For creation of general TCR data tables.
 # mod_sig_path: null
 # exp.set.file: null
-stat_cell_thold: 3
+stat_cell_thold: 10
 # Limit of detection. Cell absolute frequency threshold to call a response against a pathogen for a given donor.
-limit_of_detect: 1
+limit_of_detect: 10
 # donor_meta: null
