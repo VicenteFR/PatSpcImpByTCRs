@@ -242,7 +242,7 @@ if(!'donor.id.tag' %in% colnames(tcr.meta)){
     # Add mock donor ID.
     tcr.meta[, donor.id.tag:='Mock']
 }else{
-    tcr.meta[!is.na(donor.id.tag)]
+    tcr.meta <- tcr.meta[!is.na(donor.id.tag)]
 }
 
 

@@ -222,6 +222,7 @@ if(!is.na(tcr.meta.file)){
 }
 # @ Clonotype-based info.
 clone.info <- fread(file=clone.info.file)
+clone.info[, donor.id.tag:=as.character(donor.id.tag)]
 
 # ---> HLA info.
 # For query data.
@@ -257,6 +258,7 @@ if(!is.null(ref.hla.info.file)){
 donor.meta <- if(!is.null(donor.meta.file)) fread(file=donor.meta.file) else NULL
 if(!is.null(donor.meta)){
     tmp.check.1 <- 'donor.id.tag' %in% colnames(donor.meta)
+    donor.meta[, donor.id.tag:=as.character(donor.id.tag)]
     tmp.check.2 <- gex.meta[!is.na(donor.id.tag), all(donor.id.tag %in% donor.meta[, donor.id.tag])]
     tmp.check <- tmp.check.1 & tmp.check.2
     if(!tmp.check) stop('Faulty donor metadata file. Must contain column \'donor.id.tag\' and info for all donors described in GEx input must be provided.\n')

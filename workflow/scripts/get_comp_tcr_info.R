@@ -630,7 +630,7 @@ setorderv(x=clone.meta, col=to.order, order=c(-1))
 
 # Simplify if there's a single tissue in the dataset.
 if(single.tissue){
-    colnames(clone.meta) <- str_replace(string=colnames(clone.meta), pattern='healthy\\.', replacement='')
+    colnames(clone.meta) <- str_replace(string=colnames(clone.meta), pattern='^healthy\\.|^tumor\\.', replacement='')
 }
 
 # @ Whole dataset.
