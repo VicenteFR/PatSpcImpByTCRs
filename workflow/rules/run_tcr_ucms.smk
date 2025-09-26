@@ -13,7 +13,6 @@ rule process_output:
     params:
         PIPELINE = PIPELINE,
         reports_path = f'{config["paths"]["output"]}/' + '/clust_results/{ref}/{tool}/RefThold-{ref_thold}',
-        r_mod = config['r_mod'],
         run_id = '{ref}_RefThold-{ref_thold}',
         process_opts = lambda wildcards: config['process_opts'][wildcards.ref]
     log:
@@ -25,7 +24,7 @@ rule process_output:
         mem_mb = get_mem_mb_light,
         runtime = '160h'
     conda:
-        "workflow/envs/r_analysis.yaml"
+        "../envs/r_analyses.yaml"
     shell:
         'Rscript {params.PIPELINE}/workflow/scripts/process_output.R --Tool {wildcards.tool} --RunID {params.run_id} --ReportsPath {params.reports_path} --ToolOutput {input.tool_out} --RefInfo {input.ref_info} {params.process_opts} > {log} 2>&1'
 
@@ -50,37 +49,27 @@ rule run_tool:
         runtime = '160h'
     conda:
         select_env
-    run:
-        if wildcards.tool == 'GIANA':
-            shell(
-                'cd {params.reports_path}\n'
-                'python {params.PIPELINE}/workflow/scripts/giana/GIANA4.py -f {input} -o {params.reports_path} {params.tool_opts} > {log} 2>&1\n'
-                'mv {params.reports_path}/ToolInput--RotationEncodingBL62.txt {params.reports_path}/GIANA_Clusters.csv'
-            )
-        elif wildcards.tool == 'TCRdist3':
-            shell(
-                'cd {params.reports_path}\n'
-                'python {params.PIPELINE}/workflow/scripts/run_tcrdist3_from_fmtd_input.py --RunID {params.run_id} --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1'
-            )
-        elif wildcards.tool == 'GLIPH2':
-            shell(
-                'cd {params.reports_path}\n'
-                'Rscript {params.PIPELINE}/workflow/scripts/gliph2/run_gliph2_from_fmtd_input.R --RunID {params.run_id} --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1'
-            )
-        elif wildcards.tool == 'clusTCR':
-            shell(
-                'cd {params.reports_path}\n'
-                'python {params.PIPELINE}/workflow/scripts/run_clustcr_from_fmtd_input.py --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1'
-            )
-        elif wildcards.tool == 'iSMART':
-            shell(
-                'cd {params.reports_path}\n'
-                'cp {input} {params.reports_path}/Input_CDR3s.tsv\n'
-                'python {params.PIPELINE}/workflow/scripts/ismart/iSMARTv3.py -f {params.reports_path}/Input_CDR3s.tsv {params.tool_opts} > {log} 2>&1\n'
-                'mv {params.reports_path}/Input_CDR3s.tsv_ClusteredCDR3s_*.txt {params.reports_path}/iSMART_Clusters.csv'
-            )
-        else:
-            raise Exception("Unproper tool definition while running directive of rule 'run_tool'.")
+    shell:
+        r'''
+            cd {params.reports_path}
+            if [ '{wildcards.tool}' == 'GIANA' ]; then
+                python {params.PIPELINE}/workflow/scripts/giana/GIANA4.py -f {input} -o {params.reports_path} {params.tool_opts} > {log} 2>&1;
+                mv {params.reports_path}/ToolInput--RotationEncodingBL62.txt {params.reports_path}/GIANA_Clusters.csv
+            elif [ '{wildcards.tool}' == 'TCRdist3' ]; then
+                python {params.PIPELINE}/workflow/scripts/run_tcrdist3_from_fmtd_input.py --RunID {params.run_id} --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1
+            elif [ '{wildcards.tool}' == 'GLIPH2' ]; then
+                Rscript {params.PIPELINE}/workflow/scripts/gliph2/run_gliph2_from_fmtd_input.R --RunID {params.run_id} --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1
+            elif [ '{wildcards.tool}' == 'clusTCR' ]; then
+                python {params.PIPELINE}/workflow/scripts/run_clustcr_from_fmtd_input.py --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1
+            elif [ '{wildcards.tool}' == 'iSMART' ]; then
+                cp {input} {params.reports_path}/Input_CDR3s.tsv;
+                python {params.PIPELINE}/workflow/scripts/ismart/iSMARTv3.py -f {params.reports_path}/Input_CDR3s.tsv {params.tool_opts} > {log} 2>&1;
+                mv {params.reports_path}/Input_CDR3s.tsv_ClusteredCDR3s_*.txt {params.reports_path}/iSMART_Clusters.csv
+            else
+                echo "Unproper tool definition while running directive of rule 'run_tool'." >&2
+                exit 1
+            fi
+        '''
 
 
 rule get_clust_input:
@@ -91,7 +80,6 @@ rule get_clust_input:
         f'{config["paths"]["output"]}/' + 'tools_input/{ref}/RefThold-{ref_thold}/GeneralBetaInfo.csv'
     params:
         PIPELINE = PIPELINE,
-        r_mod = config['r_mod'],
         reports_path = f'{config["paths"]["output"]}/' + '/tools_input/{ref}/RefThold-{ref_thold}',
         run_id = 'RefThold-{ref_thold}'
     log:
@@ -103,6 +91,6 @@ rule get_clust_input:
         mem_mb = get_mem_mb_heavy,
         runtime = '120h'
     conda:
-        "workflow/envs/r_analysis.yaml"
+        "../envs/r_analyses.yaml"
     shell:
         'Rscript {params.PIPELINE}/workflow/scripts/get_clust_input.R --ReportsPath {params.reports_path} --RunID {params.run_id} --InputTable {input} > {log} 2>&1'

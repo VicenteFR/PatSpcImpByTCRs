@@ -35,8 +35,7 @@ rule get_comp_tcr_info:
         gex_aggr = lambda wildcards: config['gex_data'][wildcards.ref]['aggr_table'],
         raw_data = lambda wildcards: config['gex_data'][wildcards.ref]['aggr_out'],
         clusts_lab = lambda wildcards: config['gex_data'][wildcards.ref]['clusters_tag'],
-        funct_file = f'{PIPELINE}/workflow/scripts/handy_functions.R',
-        r_mod = config['preds_r_mod'],
+        funct_file = f'{PIPELINE}/workflow/scripts/handy_functions.R'
     log:
         f'{config["paths"]["output"]}/' + 'jobs_scripts/logs/comp_tcr_info/{ref}.log'
     threads: 1
@@ -44,6 +43,6 @@ rule get_comp_tcr_info:
         mem_mb = get_mem_mb_heavy,
         runtime = '160h'
     conda:
-        "workflow/envs/r_analysis.yaml"
+        "../envs/r_analyses.yaml"
     shell:
         'Rscript {params.PIPELINE}/workflow/scripts/get_comp_tcr_info.R --ReportsPath {params.reports_path} --OptsFile1 {params.opts_file_1} --OptsFile2 {params.opts_file_2} --RefID {wildcards.ref} --AggrPath {params.vdj_data} --GExData {params.gex_data} --VDJAggrTable {params.vdj_aggr} --GExAggrTable {params.gex_aggr} {params.raw_data} --ClustsLab {params.clusts_lab} > {log} 2>&1'
