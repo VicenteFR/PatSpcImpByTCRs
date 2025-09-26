@@ -24,9 +24,9 @@ rule process_output:
     resources:
         mem_mb = get_mem_mb_light,
         runtime = '160h'
+    conda:
+        "workflow/envs/r_analysis.yaml"
     shell:
-        'module unload R\n'
-        'module load {params.r_mod}\n'
         'Rscript {params.PIPELINE}/workflow/scripts/process_output.R --Tool {wildcards.tool} --RunID {params.run_id} --ReportsPath {params.reports_path} --ToolOutput {input.tool_out} --RefInfo {input.ref_info} {params.process_opts} > {log} 2>&1'
 
 
@@ -48,36 +48,32 @@ rule run_tool:
     resources:
         mem_mb = get_mem_mb_heavy,
         runtime = '160h'
+    conda:
+        select_env
     run:
         if wildcards.tool == 'GIANA':
             shell(
-                'source activate env_for_giana\n'
                 'cd {params.reports_path}\n'
                 'python {params.PIPELINE}/workflow/scripts/giana/GIANA4.py -f {input} -o {params.reports_path} {params.tool_opts} > {log} 2>&1\n'
                 'mv {params.reports_path}/ToolInput--RotationEncodingBL62.txt {params.reports_path}/GIANA_Clusters.csv'
             )
         elif wildcards.tool == 'TCRdist3':
             shell(
-                'source activate env_for_tcrdist3\n'
                 'cd {params.reports_path}\n'
                 'python {params.PIPELINE}/workflow/scripts/run_tcrdist3_from_fmtd_input.py --RunID {params.run_id} --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1'
             )
         elif wildcards.tool == 'GLIPH2':
             shell(
-                'module unload R\n'
-                'module load R/3.6.1\n'
                 'cd {params.reports_path}\n'
-                'Rscript {params.PIPELINE}/workflow/scripts/run_gliph2_from_fmtd_input.R --Server slurm --RunID {params.run_id} --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1'
+                'Rscript {params.PIPELINE}/workflow/scripts/gliph2/run_gliph2_from_fmtd_input.R --RunID {params.run_id} --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1'
             )
         elif wildcards.tool == 'clusTCR':
             shell(
-                'source activate env_for_clustcr\n'
                 'cd {params.reports_path}\n'
                 'python {params.PIPELINE}/workflow/scripts/run_clustcr_from_fmtd_input.py --InputFile {input} --ReportsPath {params.reports_path} {params.tool_opts} > {log} 2>&1'
             )
         elif wildcards.tool == 'iSMART':
             shell(
-                'source activate env_for_ismart\n'
                 'cd {params.reports_path}\n'
                 'cp {input} {params.reports_path}/Input_CDR3s.tsv\n'
                 'python {params.PIPELINE}/workflow/scripts/ismart/iSMARTv3.py -f {params.reports_path}/Input_CDR3s.tsv {params.tool_opts} > {log} 2>&1\n'
@@ -106,7 +102,7 @@ rule get_clust_input:
     resources:
         mem_mb = get_mem_mb_heavy,
         runtime = '120h'
+    conda:
+        "workflow/envs/r_analysis.yaml"
     shell:
-        'module unload R\n'
-        'module load {params.r_mod}\n'
         'Rscript {params.PIPELINE}/workflow/scripts/get_clust_input.R --ReportsPath {params.reports_path} --RunID {params.run_id} --InputTable {input} > {log} 2>&1'

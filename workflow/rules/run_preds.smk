@@ -22,9 +22,9 @@ rule intersect_modalities:
     resources:
         mem_mb = get_mem_mb_light,
         runtime = '120h'
+    conda:
+        "workflow/envs/r_analysis.yaml"
     shell:
-        'module unload R\n'
-        'module load {params.r_mod}\n'
         'Rscript {params.PIPELINE}/workflow/scripts/intersect_modalities.R --RefDefFile {input.ref_def} --RunPath {params.reports_path} --OptsFile1 {params.opts_file_1} --OptsFile2 {params.opts_file_2} --RefID {wildcards.ref} --CloneInfo {input.qry_clone_info} > {log} 2>&1'
 
 
@@ -50,8 +50,8 @@ rule predict_specificity:
     resources:
         mem_mb = get_mem_mb_light,
         runtime = '120h'
+    conda:
+        "workflow/envs/r_analysis.yaml"
     shell:
-        'module unload R\n'
-        'module load {params.r_mod}\n'
         'Rscript {params.PIPELINE}/workflow/scripts/predict_ag_specificity.R --ReportsPath {params.reports_path} --RunPath {params.run_path} --RefDefFile {input.ref_def} --RefInfo {input.ref_info} --OptsFile1 {params.opts_file_1} --OptsFile2 {params.opts_file_2} --RefID {wildcards.ref} --ExpansionThold {wildcards.ref_thold} --UCMThold {wildcards.ucm_thold} --VDJMatch {wildcards.vdj_match} > {log} 2>&1\n'
         'touch {output}'

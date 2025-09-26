@@ -1,0 +1,10 @@
+name: py-giana
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.7
+  - biopython
+  - faiss
+  - scikit-learn

@@ -49,7 +49,11 @@ Ref-2_CellBasedInfo.csv
 **Review note**: If you are reviewer, please kindly use the access token provided on the manuscript file to fetch the files from GEO.
 
 ### 3. Common config file set-up
-Edit the following file within the repo folder: `~/tools/PatSpcImpByTCRs/workflow/configs/common.yaml`. Replace `~/toools` by your selected repo folder if necessary. Please replace all instances of `/path/to/references` with the absolute path to the folder where you actually stored the reference set files per step 2.
+Edit the following file within the repo folder: `~/tools/PatSpcImpByTCRs/workflow/configs/common.yaml`, following the next substeps:
+1. Please replace all instances of `/path/to/references` with the absolute path to the folder where you actually stored the reference set files per step 2.
+2. Adjust the values for `GLIPH2` under `tool_opts`. Specifically, replace `~/tools` by your selected repo folder if necessary (flags `--ToolPath` and `--RefPath`).
+3. Under the same optiones, replace `/path/to/tmp` with a valid directory in your system meant for temporary file storage. This is also required to run GLIPH2.
+4. For option `conda-prefix` and if necessary, replace `~/tools` by your selected repo folder.
 
 **You're all set!** Now, time to test the installation...
 

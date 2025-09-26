@@ -1,0 +1,10 @@
+name: py-tcrdist3
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+    - tcrdist3

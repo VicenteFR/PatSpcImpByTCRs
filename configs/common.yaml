@@ -64,7 +64,7 @@ input_opts:
 tool_opts:
   GIANA: '-t 4'
   TCRdist3: '--Method DBSCAN --Hyper 0.01 --Chains beta'
-  GLIPH2: '--PttnLength 5 --FisherPThold 0.005 --LocalMinP 0.0001 --KMin 5 --RefVersion "2.0" --JobMem 50 --TimeLimit 2880'
+  GLIPH2: '--ToolPath ~/tools/PatSpcImpByTCRs/workflow/scripts/gliph2/irtools.centos --RefPath ~/tools/PatSpcImpByTCRs/workflow/scripts/gliph2/ --TMP /path/to/tmp --PttnLength 5 --FisherPThold 0.005 --LocalMinP 0.0001 --KMin 5 --RefVersion "2.0" --TimeLimit 2880'
   clusTCR: '--Method "two-step" --Expansion 3 --Inflation 1.2 --UseAlpha FALSE'
   iSMART: '-t 7.5'
 
@@ -128,6 +128,6 @@ ag_spc_cols:
     Multiple: '#808080'
 
 
-# ---> On versions and scripts
-r_mod: 'R/3.6.1'
-preds_r_mod: 'R/4.2.2'
+# ---> On conda.
+use-conda: true
+conda-prefix: '~/tools/PatSpcImpByTCRs/.snakemake/conda'

@@ -1,0 +1,20 @@
+name: r-analyses
+channels:
+  - r
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base=4.2
+  - r-seurat=4.4.0
+  - r-optparse
+  - r-data.table
+  - r-tidyr
+  - r-stringr
+  - r-fuzzyjoin
+  - r-gtools
+  - r-ggplot2
+  - r-ggpubr
+  - r-pheatmap
+  - r-hmisc
+  - r-corrplot

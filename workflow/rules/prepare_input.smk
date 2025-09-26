@@ -43,7 +43,7 @@ rule get_comp_tcr_info:
     resources:
         mem_mb = get_mem_mb_heavy,
         runtime = '160h'
+    conda:
+        "workflow/envs/r_analysis.yaml"
     shell:
-        'module unload R\n'
-        'module load {params.r_mod}\n'
         'Rscript {params.PIPELINE}/workflow/scripts/get_comp_tcr_info.R --ReportsPath {params.reports_path} --OptsFile1 {params.opts_file_1} --OptsFile2 {params.opts_file_2} --RefID {wildcards.ref} --AggrPath {params.vdj_data} --GExData {params.gex_data} --VDJAggrTable {params.vdj_aggr} --GExAggrTable {params.gex_aggr} {params.raw_data} --ClustsLab {params.clusts_lab} > {log} 2>&1'
