@@ -13,10 +13,10 @@ For details on the workflow, please see [**paper cite to be updated upon publica
 🔧 System requirements
 ------------
 
-* **Operating system**: Linux or macOS (tested on Ubuntu 22.04, macOS Ventura)
+* **Operating system**: Linux (tested on Linux 8.6--Green Obsidian)
 * **[Snakemake](https://snakemake.readthedocs.io/en/stable/index.html)**: v7.22.0
 * **[R](https://cran.r-project.org/)**: v4.2.2
-* **[Python](https://cran.r-project.org/)**: v3.11.0
+* **[Python](https://cran.r-project.org/)**: v3.11
 * **[GIANA](https://github.com/s175573/GIANA)**
 * **[TCRdist3](https://tcrdist3.readthedocs.io/en/latest/)**
 * **[iSMART](https://github.com/s175573/iSMART)**
@@ -24,6 +24,11 @@ For details on the workflow, please see [**paper cite to be updated upon publica
 * **[GLIPH2](http://50.255.35.37:8080/)**
 * Additional R packages: `optparse`, `Seurat`, `data.table`, `tidyr`, `stringr`, `fuzzyjoin` `ggplot2`, `ggpubr`, `pheatmap`, `Hmisc`, `corrplot`
 * Additional Python packages: `optparse`, `numpy`, `pandas`, `sklearn.cluster`, `matplotlib`
+
+**Before installation**, the only dependency that is strictly required is `Snakemake`, installed as part of a specific conda environment. Please create your environment as follows:
+```bash
+conda create -n snakemake_v7 -c conda-forge python=3.11.0 snakemake=7.22.0
+```
 
 📥 Installation
 ------------
@@ -34,7 +39,7 @@ git clone https://github.com/VicenteFR/PatSpcImpByTCRs.git
 ```
 Make sure to replace `~/tools` with the path you wish to clone the repo into, although this is the recommended location.<br>
 **Note that you only need to clone once**. Each new dataset/project should live in its own folder and reference this repository through the dataset-specific config file—see below.<br/>
-This step takes ~1 minute.
+This step takes ~5 minutes.
 
 ### 2. Download the TCR reference sets
 Please fetch the files through GEO with the accession number GSExxx (**accession number to be updated upon publication**). These are relatively large files—make sure to store them in a proper location. The files should be named as follows:
@@ -61,7 +66,7 @@ Edit the following file within the repo folder: `~/tools/PatSpcImpByTCRs/workflo
 🧪 Demo
 ------------
 
-We provide a small demo dataset in `./tests` for quick testing.
+We provide a small demo dataset in `./tests` for quick testing. For the steps below, replace `~/tools` with your repo-enclosing folder as necessary.
 
 1. Navigate to the output folder for the demo dataset:
 ```bash
@@ -72,15 +77,15 @@ cd ~/tools/PatSpcImpByTCRs/tests/test_out
 
 3. Activate your Snakemake conda environment and run a dry run to check the DAG:
 ```bash
-conda activate snakemake
+conda activate snakemake_v7
 snakemake -np
 ```
 4. Indicating the proper of cores available to you (example with 2 cores only), execute the workflow on the demo dataset:
 ```bash
-snakemake --cores 2
+snakemake --cores 2 --use-conda --conda-prefix ~/tools/PatSpcImpByTCRs/.snakemake/conda
 ```
-This will generate example outputs in the results/ folder in under 15 minutes when 2 cores are provided. Naturally, the greater the number of cores, the quicker the workflow will complete.<br/>
-File `AllDone.txt` in the folder `test_out` indicates that the workflow ran in its entirety.<br/>
+This will generate example outputs in the results/ folder in under 20 minutes when 2 cores are provided. Please note that this takes relatively long because the environments are created and thereby hashed for the first time. Naturally, the greater the number of cores, the quicker the workflow will complete.<br/>
+File `AllDone.txt` in the folder `~/tools/PatSpcImpByTCRs/tests/test_out` indicates that the workflow ran in its entirety.<br/>
 Several folders must be generated in the process, but the most relevant outputs are the following:<br/>
 `./specificity_pred/EpRef-1/VDJMatch-TRUE/RefThold-1/UCMThold-X`: Output for CD8 T cells.<br/>
 `./specificity_pred/EpRef-1/VDJMatch-TRUE/RefThold-2/UCMThold-X`: Output for CD4 T cells.
@@ -104,16 +109,17 @@ cp ~/tools/PatSpcImpByTCRs/templates/wrapper.Snakefile Snakefile
 mkdir configs
 cp ~/tools/PatSpcImpByTCRs/templates/config.yaml configs/config.yaml
 ```
-Please also make sure to modify options `PIPELINE` and `R_functions` under `paths` as necessary.
+Please also make sure to modify options `PIPELINE` and `R_functions` under `paths` as necessary--pointing to the proper repo-enclosing folder.
 
-4. Dry run to confirm the workflow:
+4. Dry run to confirm the workflow's functionality:
 ```bash
+conda activate snakemake_v7
 snakemake -np
 ```
 
 5. Run the workflow:
 ```bash
-snakemake --cores 8
+snakemake --cores 8 --use-conda --conda-prefix ~/tools/PatSpcImpByTCRs/.snakemake/conda
 ```
 
 Results will appear in the folder specified in `config.yaml` under options `paths` and `output`.
