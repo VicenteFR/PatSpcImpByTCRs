@@ -753,16 +753,17 @@ clust.obj <- tryCatch(
     error=function(e) NULL
 )
 # Set metadata.
+tmp.pttn <- paste0('.', names(ag.spc.cols), '$', collapse='|')
 col.meta <- data.frame(
     row.names=colnames(hmap.data),
-    `Cluster`=str_extract(
+    `Cluster`=str_replace(
         string=colnames(hmap.data),
-        pattern='^\\d+'
+        pattern=tmp.pttn, replacement=''
     ),
-    `Specificity`=str_replace(
+    `Specificity`=str_replace(string=str_extract(
         string=colnames(hmap.data),
-        pattern='^\\d+\\.', replacement=''
-    )
+        pattern=tmp.pttn
+    ), pattern='^\\.', replacement='')
 )
 # Define colors for metadata tracks.
 ann.colors <- list(
