@@ -56,7 +56,7 @@ def get_mem_mb_heavy(wildcards, attempt):
     return attempt * 100000
 
 def select_env(wildcards):
-    return f'../envs/{wildcards.tool}.yaml'
+    return f'~/tools/PatSpcImpByTCRs/workflow/envs/{wildcards.tool}.yaml'
 
 def get_pred_outs(wildcards):
     return expand(
@@ -131,6 +131,6 @@ rule compare_ref_options:
         mem_mb = get_mem_mb_light,
         runtime = '120h'
     conda:
-        "../envs/r_analyses.yaml"
+        "~/tools/PatSpcImpByTCRs/workflow/envs/r_analyses.yaml"
     shell:
         'Rscript {params.PIPELINE}/workflow/scripts/comp_opts.R --ReportsPath {params.reports_path} --RunPath {params.run_path} --OptsFile1 {params.opts_file_1} --OptsFile2 {params.opts_file_2} --RefID {wildcards.ref} > {log} 2>&1'

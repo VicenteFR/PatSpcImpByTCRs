@@ -24,7 +24,7 @@ rule process_output:
         mem_mb = get_mem_mb_light,
         runtime = '160h'
     conda:
-        "envs/r_analyses.yaml"
+        "~/tools/PatSpcImpByTCRs/workflow/envs/r_analyses.yaml"
     shell:
         'Rscript {params.PIPELINE}/workflow/scripts/process_output.R --Tool {wildcards.tool} --RunID {params.run_id} --ReportsPath {params.reports_path} --ToolOutput {input.tool_out} --RefInfo {input.ref_info} {params.process_opts} > {log} 2>&1'
 
@@ -91,6 +91,6 @@ rule get_clust_input:
         mem_mb = get_mem_mb_heavy,
         runtime = '120h'
     conda:
-        "envs/r_analyses.yaml"
+        "~/tools/PatSpcImpByTCRs/workflow/envs/r_analyses.yaml"
     shell:
         'Rscript {params.PIPELINE}/workflow/scripts/get_clust_input.R --ReportsPath {params.reports_path} --RunID {params.run_id} --InputTable {input} > {log} 2>&1'
