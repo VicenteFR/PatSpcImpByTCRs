@@ -56,7 +56,7 @@ def get_mem_mb_heavy(wildcards, attempt):
     return attempt * 100000
 
 def select_env(wildcards):
-    return f'../envs/{wildcards.tool}.yaml'
+    return f'envs/{wildcards.tool}.yaml'
 
 def get_pred_outs(wildcards):
     return expand(
