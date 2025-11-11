@@ -24,8 +24,6 @@ cat('Importing libraries...\n\n')
 library(stringr)
 library(data.table)
 library(optparse)
-source('/home/vfajardo/scripts/functions/R_handy_functions.0.4.R')
-source('/home/vfajardo/scripts/functions/R_visualization_functions.1.5.R')
 cat('Libraries imported!\n')
 
 
@@ -147,9 +145,11 @@ write(x=param.content, file=param.file)
 # ---> Define and run commands.
 tmp.cmmd <- paste0('cp ', tool.path, ' ', tmp.path)
 system(command=tmp.cmmd)
-tmp.cmmd <- paste0('cd ', tmp.path)
-system(command=tmp.cmmd)
-tmp.cmmd <- paste0('./', basename(tool.path), ' -c ', param.file)
+tmp.cmmd <- paste0(
+	'cd ', tmp.path,
+	' && ',
+	'./', basename(tool.path), ' -c ', param.file
+)
 system(command=tmp.cmmd)
 
 # ---> Wait until the process is complete.

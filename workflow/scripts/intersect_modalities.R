@@ -498,40 +498,39 @@ pheatmap(
     legend=FALSE, annotation_legend=FALSE, annotation_names_row=FALSE, annotation_names_col=FALSE,
     filename=tmp.file.name, heigh=tmp.height, width=tmp.width.b
 )
-# @ Color legend only.
-tmp.data <- as.data.frame(tmp.data)
-tmp.data$donor.id.tag <- row.names(tmp.data)
-tmp.data <- gather(data=tmp.data, key='spc', value='freq.rel', -`donor.id.tag`)
-tmp.data <- tmp.data[!is.na(tmp.data$freq.rel), ]
+# @ Color legend only. Only works w/ ggpubr>=0.6. To implement when dependency issue is resolved.
+# tmp.data <- as.data.frame(tmp.data)
+# tmp.data$donor.id.tag <- row.names(tmp.data)
+# tmp.data <- gather(data=tmp.data, key='spc', value='freq.rel', -`donor.id.tag`)
+# tmp.data <- tmp.data[!is.na(tmp.data$freq.rel), ]
 # W/ labels
-tmp.ggplot <- ggplot(data=tmp.data, aes(x=freq.rel, y=freq.rel, col=freq.rel)) + 
-    geom_point() +
-
-    scale_color_gradientn(colors=hmap.col.scale) +
-    theme(
-        legend.ticks=element_line(color='black', linewidth=0.6),
-        legend.ticks.length=unit(0.22, "cm"),
-        legend.frame=element_rect(color='black', linewidth=0.6)
-    )
-tmp.ggplot <- get_legend(p=tmp.ggplot)
-tmp.file.name <- paste0(reps.path, '/Donor_Reactivity_CellFract.L1.pdf')
-pdf(file=tmp.file.name, height=2, width=2)
-print(as_ggplot(tmp.ggplot))
-dev.off()
+# tmp.ggplot <- ggplot(data=tmp.data, aes(x=freq.rel, y=freq.rel, col=freq.rel)) + 
+#     geom_point() +
+#     scale_color_gradientn(colors=hmap.col.scale) +
+#     theme(
+#         legend.ticks=element_line(color='black', linewidth=0.6),
+#         legend.ticks.length=unit(0.22, "cm"),
+#         legend.frame=element_rect(color='black', linewidth=0.6)
+#     )
+# tmp.ggplot <- get_legend(p=tmp.ggplot)
+# tmp.file.name <- paste0(reps.path, '/Donor_Reactivity_CellFract.L1.pdf')
+# pdf(file=tmp.file.name, height=2, width=2)
+# print(as_ggplot(tmp.ggplot))
+# dev.off()
 # W/out labels
-tmp.ggplot <- ggplot(data=as.data.frame(tmp.data), aes(x=freq.rel, y=freq.rel, col=freq.rel)) + 
-    geom_point() +
-    scale_color_gradientn(colors=hmap.col.scale, name=NULL, labels=NULL) +
-    theme(
-        legend.ticks=element_line(color='black', linewidth=0.6),
-        legend.ticks.length=unit(0.22, "cm"),
-        legend.frame=element_rect(color='black', linewidth=0.6)
-    )
-tmp.ggplot <- get_legend(p=tmp.ggplot)
-tmp.file.name <- paste0(reps.path, '/Donor_Reactivity_CellFract.L2.pdf')
-pdf(file=tmp.file.name, height=1.25, width=0.3)
-print(as_ggplot(tmp.ggplot))
-dev.off()
+# tmp.ggplot <- ggplot(data=as.data.frame(tmp.data), aes(x=freq.rel, y=freq.rel, col=freq.rel)) + 
+#     geom_point() +
+#     scale_color_gradientn(colors=hmap.col.scale, name=NULL, labels=NULL) +
+#     theme(
+#         legend.ticks=element_line(color='black', linewidth=0.6),
+#         legend.ticks.length=unit(0.22, "cm"),
+#         legend.frame=element_rect(color='black', linewidth=0.6)
+#     )
+# tmp.ggplot <- get_legend(p=tmp.ggplot)
+# tmp.file.name <- paste0(reps.path, '/Donor_Reactivity_CellFract.L2.pdf')
+# pdf(file=tmp.file.name, height=1.25, width=0.3)
+# print(as_ggplot(tmp.ggplot))
+# dev.off()
 
 # ---> Prevalence of pathogen-specific T cells in the lung. Summary across donors
 # @ Data fetch
@@ -692,7 +691,6 @@ tmp.groups <- c(
 
 #   @ Fractions of ag set-specific cells/clonotypes in the group (cluster) out of all ag set-specific cells/clonotypes.
 # Preflights
-cat.var <- 'clusters.tag'
 quant.data <- lapply(X=names(tmp.groups), FUN=function(ag.group){
     tmp.vals <- tmp.groups[[ag.group]]
     tmp.data.1 <- quant.data[
@@ -701,7 +699,7 @@ quant.data <- lapply(X=names(tmp.groups), FUN=function(ag.group){
             cell.freq.abs=.SD[consensus.pred %in% tmp.vals, .N],
             clon.freq.abs=.SD[consensus.pred %in% tmp.vals, uniqueN(clonotype.tag)]
         ),
-        by=.(donor.id.tag, cat.tag=get(cat.var))
+        by=.(donor.id.tag, cat.tag=clusters.tag)
     ]
     tmp.data.2 <- quant.data[
         !is.na(donor.id.tag) &
@@ -858,42 +856,42 @@ pheatmap(
 # @ Color legend only.
 # W/ labels
 # tmp.breaks <- if(tmp.group %in% names(ag.group.breaks)) NULL else ag.group.breaks[[tmp.group]]
-tmp.breaks <- NULL
-tmp.data <- as.data.table(gather(data=as.data.frame(hmap.data), key=key, value=value))
-tmp.data <- tmp.data[!is.na(value)]
-tmp.ggplot <- ggplot(data=tmp.data, aes(x=value, y=value, col=value)) + 
-    geom_point() +
-    scale_color_gradientn(colors=hmap.col.scale) +
-    theme(
-        legend.ticks=element_line(color='black', linewidth=0.6),
-        legend.ticks.length=unit(0.22, "cm"),
-        legend.frame=element_rect(color='black', linewidth=0.6)
-    )
-tmp.ggplot <- get_legend(p=tmp.ggplot)
-tmp.file.name <- paste0(
-    tmp.reports.path, '/',
-    'Donor_Reactivity_CellFract_Legend.L1.pdf'
-)
-pdf(file=tmp.file.name, height=2, width=2)
-print(as_ggplot(tmp.ggplot))
-dev.off()
+# tmp.breaks <- NULL
+# tmp.data <- as.data.table(gather(data=as.data.frame(hmap.data), key=key, value=value))
+# tmp.data <- tmp.data[!is.na(value)]
+# tmp.ggplot <- ggplot(data=tmp.data, aes(x=value, y=value, col=value)) + 
+#     geom_point() +
+#     scale_color_gradientn(colors=hmap.col.scale) +
+#     theme(
+#         legend.ticks=element_line(color='black', linewidth=0.6),
+#         legend.ticks.length=unit(0.22, "cm"),
+#         legend.frame=element_rect(color='black', linewidth=0.6)
+#     )
+# tmp.ggplot <- get_legend(p=tmp.ggplot)
+# tmp.file.name <- paste0(
+#     tmp.reports.path, '/',
+#     'Donor_Reactivity_CellFract_Legend.L1.pdf'
+# )
+# pdf(file=tmp.file.name, height=2, width=2)
+# print(as_ggplot(tmp.ggplot))
+# dev.off()
 # W/out labels
-tmp.ggplot <- ggplot(data=tmp.data, aes(x=value, y=value, col=value)) + 
-    geom_point() +
-    scale_color_gradientn(colors=hmap.col.scale, name=NULL, labels=NULL) +
-    theme(
-        legend.ticks=element_line(color='black', linewidth=0.6),
-        legend.ticks.length=unit(0.22, "cm"),
-        legend.frame=element_rect(color='black', linewidth=0.6)
-    )
-tmp.ggplot <- get_legend(p=tmp.ggplot)
-tmp.file.name <- paste0(
-    tmp.reports.path, '/',
-    'Donor_Reactivity_CellFract_Legend.L2.pdf'
-)
-pdf(file=tmp.file.name, height=1.25, width=0.3)
-print(as_ggplot(tmp.ggplot))
-dev.off()
+# tmp.ggplot <- ggplot(data=tmp.data, aes(x=value, y=value, col=value)) + 
+#     geom_point() +
+#     scale_color_gradientn(colors=hmap.col.scale, name=NULL, labels=NULL) +
+#     theme(
+#         legend.ticks=element_line(color='black', linewidth=0.6),
+#         legend.ticks.length=unit(0.22, "cm"),
+#         legend.frame=element_rect(color='black', linewidth=0.6)
+#     )
+# tmp.ggplot <- get_legend(p=tmp.ggplot)
+# tmp.file.name <- paste0(
+#     tmp.reports.path, '/',
+#     'Donor_Reactivity_CellFract_Legend.L2.pdf'
+# )
+# pdf(file=tmp.file.name, height=1.25, width=0.3)
+# print(as_ggplot(tmp.ggplot))
+# dev.off()
 
 # ---> Summarization across donors.
 tmp.reports.path <- paste0(phens.path, '/summ_info')

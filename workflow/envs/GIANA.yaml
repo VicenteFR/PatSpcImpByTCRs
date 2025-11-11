@@ -8,3 +8,4 @@ dependencies:
   - biopython
   - faiss
   - scikit-learn
+  - pandas=1.2.3
